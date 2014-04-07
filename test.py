@@ -11,30 +11,6 @@ import wx
 
 
 
-### Optimisation avec Sylvain -----------------
-def fais_le(c, tbl, transforms):
-    tr = transforms
-    for row in c.execute("SELECT * FROM %s"%tbl):
-        while True:
-            row = c.fetchone()
-            if row == None:
-                break
-
-            yield [tr[i](row[i]) for i in range(1)]
-
-
-# Une fonction qui convertit une string, l'autre pas
-ff, fn = lambda s: s.encode('utf-8'), lambda s: s
-
-params = (
-    { 'tbl':'syllabes', 'transforms':(ff,ff,ff) },
-    { 'tbl':'syllabes_precedentes', 'transforms':(ff,ff,ff) },
-    { 'tbl':'syllabes_suivantes', 'transforms':(ff,ff,ff)}
-)
-
-
-#
-##### FIN optimisation -----------------
 def extraction_db(c):
 
     for row in c.execute("SELECT * FROM syllabes"):
@@ -57,14 +33,6 @@ def extraction_db(c):
             print row[0].encode('utf-8'), row[1].encode('utf-8'), row[2]
     return None
 
-
-def extraction_syllabes(c):
-    for row in c.execute("SELECT * FROM syllabes"):
-        while True:
-            row = c.fetchone()
-            if row == None:
-                break
-            print row[0].encode('utf-8'), row[1], row[2]
 
 
 
@@ -150,16 +118,7 @@ lecture_syllabes(c, '010_C7.xml')
 connection.commit()
 
 
-#extraction_db(c)
-res = []
-for param in params:
-    for syl1 in fais_le(c, **param):
-        res.append(syl1)
-
-
-
-
-
+extraction_db(c)
 
 
 
@@ -188,7 +147,7 @@ class ExamplePanel(wx.Panel):
 
 
         # the combobox Control
-        self.sampleList = res
+        self.sampleList = ['bla', 'blabla']
         self.lblhear = wx.StaticText(self, label="How did you hear from us ?", pos=(20, 90))
         self.edithear = wx.ComboBox(self, pos=(150, 90), size=(95, -1), choices=self.sampleList, style=wx.CB_DROPDOWN)
         self.Bind(wx.EVT_COMBOBOX, self.EvtComboBox, self.edithear)
@@ -215,6 +174,31 @@ frame.Show()
 app.MainLoop()
 
 
+
+
+
+### Optimisation avec Sylvain -----------------
+def fais_le(c, tbl, transforms):
+    tr = transforms
+    for row in c.execute("SELECT * FROM %s"%tbl):
+        while True:
+            row = c.fetchone()
+            if row == None:
+                break
+            yield [tr[i](row[i]) for i in range(3)]
+
+# Une fonction qui convertit une string, l'autre pas
+ff, fn = lambda s: s.encode('utf-8'), lambda s: s
+
+params = (
+    { 'tbl':'syllabes', 'transforms':(ff,fn,fn) },
+    { 'tbl':'syllabes_precedentes', 'transforms':(ff,ff,fn) },
+    { 'tbl':'syllabes_suivantes', 'transforms':(ff,ff,fn)}
+)
+
+for param in params:
+    for syl1, syl2, syl3 in fais_le(c, **param):
+        print syl1, syl2, syl3
 
 
 connection.close()

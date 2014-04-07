@@ -118,7 +118,7 @@ lecture_syllabes(c, '010_C7.xml')
 connection.commit()
 
 
-extraction_db(c)
+#extraction_db(c)
 
 
 
@@ -185,20 +185,22 @@ def fais_le(c, tbl, transforms):
             row = c.fetchone()
             if row == None:
                 break
-            yield [tr[i](row[i]) for i in range(3)]
+            yield [tr[i](row[i]) for i in range(2)]
 
 # Une fonction qui convertit une string, l'autre pas
 ff, fn = lambda s: s.encode('utf-8'), lambda s: s
 
 params = (
-    { 'tbl':'syllabes', 'transforms':(ff,fn,fn) },
-    { 'tbl':'syllabes_precedentes', 'transforms':(ff,ff,fn) },
-    { 'tbl':'syllabes_suivantes', 'transforms':(ff,ff,fn)}
+    { 'tbl':'syllabes', 'transforms':(ff,fn,fn) } #,
+   # { 'tbl':'syllabes_precedentes', 'transforms':(ff,ff,fn) },
+   # { 'tbl':'syllabes_suivantes', 'transforms':(ff,ff,fn)}
 )
+res = []
+#for param in params:
+for syl, nb in fais_le(c, tbl='syllabes', transforms=(ff,fn)):
+        print syl, nb  # fait un print mais pas très utile dans notre cas
+        res.append([syl, nb])
 
-for param in params:
-    for syl1, syl2, syl3 in fais_le(c, **param):
-        print syl1, syl2, syl3
-
+print res[1]
 
 connection.close()

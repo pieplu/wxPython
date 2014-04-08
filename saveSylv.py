@@ -106,6 +106,23 @@ def lecture_syllabes(c, fichier):
     #for i in range(len(syllabes_suiv_tup)):
     #    print syllabes_suiv_tup[i][0].encode('utf-8'), syllabes_suiv_tup[i][1].encode('utf-8'), syllabes_suiv_tup[i][2]
 
+
+
+
+### PROGRAMME
+
+
+connection = sqlite3.connect('basedonnees.db')
+c = connection.cursor()
+
+lecture_syllabes(c, '010_C7.xml')
+connection.commit()
+
+
+#extraction_db(c)
+
+
+
 ### Optimisation avec Sylvain -----------------
 def fais_le(c, tbl, transforms):
     tr = transforms
@@ -119,36 +136,16 @@ def fais_le(c, tbl, transforms):
 # Une fonction qui convertit une string, l'autre pas
 ff, fn = lambda s: s.encode('utf-8'), lambda s: s
 
-
-
-def search(c,syl):
-    for ligne in c.execute("SELECT * FROM syllabes WHERE syllabe = %s"%syl):
-        while True:
-            ligne = c.fetchone()
-            if ligne == None:
-                break
-            yield ligne
-
-
-
-### PROGRAMME
-
-
-connection = sqlite3.connect('basedonnees.db')
-c = connection.cursor()
-
-lecture_syllabes(c, '010_C7.xml')
-connection.commit()
-
-result = search(c, "de")
-print result
-
-#extraction_db(c)
-
-
+params = (
+    { 'tbl':'syllabes', 'transforms':(ff,fn,fn) } #,
+   # { 'tbl':'syllabes_precedentes', 'transforms':(ff,ff,fn) },
+   # { 'tbl':'syllabes_suivantes', 'transforms':(ff,ff,fn)}
+)
+res = []
 liste_test = [['ed','3'],['fg','1'],['gh','10']]
-
+#for param in params:
 for syl, nb in fais_le(c, tbl='syllabes', transforms=(ff,fn)):
+        #print syl, nb  # fait un print mais pas très utile dans notre cas
         liste_test.append([syl, str(nb)])
 
 
@@ -180,7 +177,7 @@ class ExamplePanel(wx.Panel):
         dvlc.AppendTextColumn('Sylabe', width=70)
         dvlc.AppendTextColumn('Occurence', width=70)
         #i=0
-        for itemvalues in result:
+        for itemvalues in liste_test:
            # i+= 1
             dvlc.AppendItem(itemvalues)
            # if i>10:

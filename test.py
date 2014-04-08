@@ -127,7 +127,7 @@ def search(c,syl):
             ligne = c.fetchone()
             if ligne == None:
                 break
-            yield ligne
+            yield ligne[0].encode('utf-8'), str(ligne[1]).encode('utf-8')
 
 
 
@@ -146,7 +146,7 @@ print result
 #extraction_db(c)
 
 
-liste_test = [['ed','3'],['fg','1'],['gh','10']]
+liste_test = []
 
 for syl, nb in fais_le(c, tbl='syllabes', transforms=(ff,fn)):
         liste_test.append([syl, str(nb)])
@@ -181,21 +181,28 @@ class ExamplePanel(wx.Panel):
         dvlc.AppendTextColumn('Occurence', width=70)
 
         #ajout à la liste du tableau
-        for itemvalues in result:
-            dvlc.AppendItem(itemvalues)
 
 
         #the edit control - one line version.
         self.lblname = wx.StaticText(self, label="Recherche :", pos=(20,20))
-        self.editname = wx.TextCtrl(self, value="...", pos=(110, 20), size=(140,-1))
+        self.editname = wx.TextCtrl(self, value="de", pos=(110, 20), size=(140,-1))
         # A button
         self.button =wx.Button(self, label="Rechercher", pos=(260, 20))
         self.Bind(wx.EVT_BUTTON, self.OnClick,self.button)
 
     #def EvtComboBox(self, event):
      #   self.logger.AppendText('EvtComboBox: %s\n' % event.GetString())
+
+
+
     def OnClick(self,event):
-        self.logger.AppendText('Evtclick: %s\n' % event.GetString())
+        str_recherche = self.editname.GetValue()
+        tab_search = search(c,str_recherche)
+        for itemvalues in tab_search:
+            self.dvlc.AppendItem(itemvalues)
+
+
+
 
 
 

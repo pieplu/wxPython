@@ -122,7 +122,7 @@ ff, fn = lambda s: s.encode('utf-8'), lambda s: s
 
 
 def search(c,syl):
-    for ligne in c.execute("SELECT * FROM syllabes WHERE syllabe = %s"%syl):
+    for ligne in c.execute("SELECT * FROM syllabes WHERE syllabe = '%s'"%syl):
         while True:
             ligne = c.fetchone()
             if ligne == None:
@@ -140,7 +140,7 @@ c = connection.cursor()
 lecture_syllabes(c, '010_C7.xml')
 connection.commit()
 
-result = search(c, "de")
+result = search(c, "qu")
 print result
 
 #extraction_db(c)
@@ -179,12 +179,11 @@ class ExamplePanel(wx.Panel):
 
         dvlc.AppendTextColumn('Sylabe', width=70)
         dvlc.AppendTextColumn('Occurence', width=70)
-        #i=0
+
+        #ajout à la liste du tableau
         for itemvalues in result:
-           # i+= 1
             dvlc.AppendItem(itemvalues)
-           # if i>10:
-            #    break
+
 
         #the edit control - one line version.
         self.lblname = wx.StaticText(self, label="Recherche :", pos=(20,20))

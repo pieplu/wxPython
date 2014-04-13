@@ -41,7 +41,6 @@ def extraction_db(c):
 
 def lecture_syllabes(c, fichier):
 
-
     c.execute("CREATE TABLE IF NOT EXISTS syllabes(syllabe TEXT, frequence INT, structure TEXT)")
     c.execute(
         "CREATE TABLE IF NOT EXISTS syllabes_precedentes (syllabe_1 TEXT, syl_precedente TEXT, frequence_paire INT)")

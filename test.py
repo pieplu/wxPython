@@ -127,7 +127,7 @@ def search(c,syl):
             ligne = c.fetchone()
             if ligne == None:
                 break
-            yield ligne[0].encode('utf-8'), str(ligne[1]).encode('utf-8')
+            yield ligne[0].encode('utf-8'), str(ligne[1])
 
 
 
@@ -140,8 +140,8 @@ c = connection.cursor()
 lecture_syllabes(c, '010_C7.xml')
 connection.commit()
 
-result = search(c, "qu")
-print result
+
+
 
 #extraction_db(c)
 
@@ -180,6 +180,10 @@ class ExamplePanel(wx.Panel):
         dvlc.AppendTextColumn('Sylabe', width=70)
         dvlc.AppendTextColumn('Occurence', width=70)
 
+        for itemvalues in liste_test:
+            dvlc.AppendItem(itemvalues)
+
+
         #ajout à la liste du tableau
 
 
@@ -190,8 +194,11 @@ class ExamplePanel(wx.Panel):
         self.button =wx.Button(self, label="Rechercher", pos=(260, 20))
         self.Bind(wx.EVT_BUTTON, self.OnClick,self.button)
 
-    #def EvtComboBox(self, event):
-     #   self.logger.AppendText('EvtComboBox: %s\n' % event.GetString())
+        self.buttonTake =wx.Button(self, label="Prendre", pos=(260, 50))
+        self.Bind(wx.EVT_BUTTON, self.selectElem,self.buttonTake)
+
+
+
 
 
 
@@ -200,8 +207,12 @@ class ExamplePanel(wx.Panel):
         tab_search = search(c,str_recherche)
         for itemvalues in tab_search:
             self.dvlc.AppendItem(itemvalues)
+            self.logger.AppendText('item: %s\n' % itemvalues[0])
 
-
+    def selectElem(self,event):
+        id = self.dvlc.GetSelectedRow()
+        val = self.dvlc.GetTextValue(id, 0)
+        self.logger.AppendText('item: %s\n' % val)
 
 
 

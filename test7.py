@@ -134,7 +134,7 @@ print result
 liste_test = []
 
 for syl, nb in fais_le(c, tbl='syllabes', transforms=(ff,fn)):
-        liste_test.append([syl, unicode(nb)])
+        liste_test.append([syl.decode('utf-8'), unicode(nb)])
 
 
 print len(liste_test) #la bd est complètement rechargé à chaque execution, à voir

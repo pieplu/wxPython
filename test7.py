@@ -77,6 +77,21 @@ def lecture_syllabes(c, fichier):
     for syl in syllabes_triees:
         syllabes_tuples.append((syl, dico_syllabes[syl]))
 
+
+
+    for sylInsert, nbSyl in syllabes_tuples:
+        c.execute("SELECT * FROM syllabes WHERE syllabe = '%s'"%sylInsert)
+        if (c.fetchone()):
+            print "if " + sylInsert
+            c.execute("UPDATE syllabes SET frequence="+unicode(nbSyl)+" WHERE syllabe='"+sylInsert+"'")
+        else:
+            print "else " + sylInsert
+            insertion = [sylInsert, nbSyl]
+            c.execute("INSERT INTO syllabes VALUES("?, ?)")
+
+
+
+
     c.executemany("INSERT INTO syllabes VALUES(?, ?)", syllabes_tuples)
     syllabes_prec_triees = sorted(dico_syl_prec, key=dico_syl_prec.get, reverse=True)
     syllabes_prec_tup = []

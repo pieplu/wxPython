@@ -80,19 +80,18 @@ def lecture_syllabes(c, fichier):
 
 
     for sylInsert, nbSyl in syllabes_tuples:
-        c.execute("SELECT * FROM syllabes WHERE syllabe = '%s'"%sylInsert)
-        insertion = [sylInsert, nbSyl]
+        c.execute("SELECT * FROM syllabes WHERE syllabe = '%s'"%sylInsert) # cherche la sylable dans la table
         if (c.fetchone()):
-            print "if " + sylInsert
-            c.execute("UPDATE syllabes SET frequence="+unicode(nbSyl)+" WHERE syllabe='"+sylInsert+"'")
+            print "if, update " + sylInsert
+            c.execute("UPDATE syllabes SET frequence=frequence+"+unicode(nbSyl)+" WHERE syllabe='"+sylInsert+"'")
         else:
-            print "else " + sylInsert 
+            print "else, insert " + sylInsert
+            insertion = [sylInsert, nbSyl]
             c.execute("INSERT INTO syllabes VALUES(?, ?)", insertion)
 
-
-
-
-    #c.executemany("INSERT INTO syllabes VALUES(?, ?)", syllabes_tuples)
+# ---------------------------
+# PAIRES PRÉCÉDENTES
+# --
     syllabes_prec_triees = sorted(dico_syl_prec, key=dico_syl_prec.get, reverse=True)
     syllabes_prec_tup = []
 
@@ -100,7 +99,24 @@ def lecture_syllabes(c, fichier):
         syllabes_prec_tup.append(
             (syllabes_prec_triees[i][0], syllabes_prec_triees[i][1], dico_syl_prec[syllabes_prec_triees[i]]))
 
-    c.executemany("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", syllabes_prec_tup)
+    for syl1, sylPrec, nbSyl in syllabes_prec_tup:
+        c.execute("SELECT * FROM syllabes_precedentes WHERE syllabe_1 = '"+syl1+"' AND syl_precedente = '"+sylPrec+"'") # cherche la paire de sylable dans la table
+        if (c.fetchone()):
+            print "if, update pre " + syl1 + " " + sylPrec
+            c.execute("UPDATE syllabes_precedentes SET frequence_paire=frequence_paire+"+unicode(nbSyl)+" WHERE syllabe_1='"+syl1+"' AND syl_precedente = '"+sylPrec+"'")
+        else:
+            print "else, insert pre " + syl1 + " " + sylPrec
+            insertion = [syl1,sylPrec, nbSyl]
+            c.execute("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", insertion)
+
+
+   # c.executemany("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", syllabes_prec_tup)
+
+
+# ---------------------------
+# PAIRES SUIVANTES
+# --
+
     syllabes_suiv_triees = sorted(dico_syl_suiv, key=dico_syl_suiv.get, reverse=True)
     syllabes_suiv_tup = []
 

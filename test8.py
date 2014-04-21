@@ -12,7 +12,7 @@ import wx.dataview as dv
 #### Fonctions ##########
 
 
-
+# Affichage à la console
 def extraction_db(c):
 
     for row in c.execute("SELECT * FROM syllabes"):
@@ -31,7 +31,7 @@ def extraction_db(c):
 
 
 
-
+# Lis le / les fichiers en paramètre et charge la base de donnée (en paramètre)
 def lecture_syllabes(c, fichier):
 
 
@@ -110,13 +110,12 @@ def lecture_syllabes(c, fichier):
             c.execute("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", insertion)
 
 
-   # c.executemany("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", syllabes_prec_tup)
+
 
 
 # ---------------------------
 # PAIRES SUIVANTES
 # --
-
     syllabes_suiv_triees = sorted(dico_syl_suiv, key=dico_syl_suiv.get, reverse=True)
     syllabes_suiv_tup = []
 
@@ -136,15 +135,15 @@ def lecture_syllabes(c, fichier):
             insertion = [syl1,sylSuiv, nbSyl]
             c.execute("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", insertion)
 
-    #c.executemany("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", syllabes_suiv_tup)
 
-### Optimisation avec Sylvain -----------------
+
+### Lis la base de donné des syllabes
 def fais_le(c, tbl, transforms):
     tr = transforms
     for row in c.execute("SELECT * FROM %s"%tbl):
         row = c.fetchone()
         if row:
-            yield [tr[i](row[i]) for i in range(2)]
+            yield [tr[i](row[i]) for i in range(len(tr))] #len(tr) donne indirectement le nomre de collones à prendre dans la bd (2 pour syllabes et 3 pour les suiv et pre)
 
 # Une fonction qui convertit une string, l'autre pas
 ff, fn = lambda s: s.encode('utf-8'), lambda s: s
@@ -159,6 +158,12 @@ def search(c,syl):
 
 
 
+
+
+def afficher_db():
+    yop =1;
+
+
 ### PROGRAMME
 
 
@@ -168,19 +173,28 @@ c = connection.cursor()
 lecture_syllabes(c, '010_C7.xml')
 connection.commit()
 
-result = search(c, "qu")
-print result
+#result = search(c, "qu")
+#print result
 
 #extraction_db(c)
 
 
-liste_test = []
-
+liste_syl = []
 for syl, nb in fais_le(c, tbl='syllabes', transforms=(ff,fn)):
-        liste_test.append([syl.decode('utf-8'), unicode(nb)])
+        liste_syl.append([syl.decode('utf-8'), unicode(nb)])
+
+liste_syl_pre = []
+for syl, syl_pre, nb in fais_le(c, tbl='syllabes_precedentes', transforms=(ff,ff,fn)):
+        liste_syl_pre.append([syl.decode('utf-8'), syl_pre.decode('utf-8'), unicode(nb)])
+
+liste_syl_suiv = []
+for syl, syl_suiv, nb in fais_le(c, tbl='syllabes_suivantes', transforms=(ff,ff,fn)):
+        liste_syl_pre.append([syl.decode('utf-8'), syl_suiv.decode('utf-8'), unicode(nb)])
 
 
-print len(liste_test) #la bd est complètement rechargé à chaque execution, à voir
+print len(liste_syl)
+print len(liste_syl_pre)
+print len(liste_syl_suiv)
 
 
 
@@ -232,8 +246,8 @@ class TestLayoutConstraints(wx.Panel):
         dvlc.AppendTextColumn('Syllabe', width=75)
         dvlc.AppendTextColumn('Occurrence', width=75)
         
-        for itemvalues in liste_test:
-            dvlc.AppendItem(itemvalues)
+        #for itemvalues in liste_syl:
+        #    dvlc.AppendItem(itemvalues)
 
 
 
@@ -269,8 +283,9 @@ class TestLayoutConstraints(wx.Panel):
         #
         # AJOUT PÂQUES
         #
-        self.buttonTake =wx.Button(self, label="Prendre", pos=(260, 50))
-        self.Bind(wx.EVT_BUTTON, self.selectElem,self.buttonTake)
+
+        self.panelA.buttonTake =wx.Button(self, label="Prendre", pos=(260, 50))
+        self.Bind(wx.EVT_BUTTON, self.selectElem,self.panelA.buttonTake)
 
         
     def OnClick(self,event):

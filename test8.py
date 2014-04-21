@@ -124,7 +124,19 @@ def lecture_syllabes(c, fichier):
         syllabes_suiv_tup.append(
             (syllabes_suiv_triees[i][0], syllabes_suiv_triees[i][1], dico_syl_suiv[syllabes_suiv_triees[i]]))
 
-    c.executemany("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", syllabes_suiv_tup)
+
+
+    for syl1, sylSuiv, nbSyl in syllabes_suiv_tup:
+        c.execute("SELECT * FROM syllabes_suivantes WHERE syllabe_2 = '"+syl1+"' AND syl_suivante = '"+sylSuiv+"'") # cherche la paire de sylable dans la table
+        if (c.fetchone()):
+            print "if, update suiv " + syl1 + " " + sylSuiv
+            c.execute("UPDATE syllabes_suivantes SET freq_paire=freq_paire+"+unicode(nbSyl)+" WHERE syllabe_2='"+syl1+"' AND syl_suivante = '"+sylSuiv+"'")
+        else:
+            print "else, insert suiv " + syl1 + " " + sylSuiv
+            insertion = [syl1,sylSuiv, nbSyl]
+            c.execute("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", insertion)
+
+    #c.executemany("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", syllabes_suiv_tup)
 
 ### Optimisation avec Sylvain -----------------
 def fais_le(c, tbl, transforms):

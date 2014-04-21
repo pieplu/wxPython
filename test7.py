@@ -202,7 +202,10 @@ class TestLayoutConstraints(wx.Panel):
         
         self.panelA.logger = wx.TextCtrl(self, pos=(400,20), size=(150,60), style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.panelA.editname = wx.TextCtrl(self, value="...", pos=(110, 20), size=(140,-1))
-        self.panelA.button =wx.Button(self, label="Rechercher", pos=(260, 17))        
+        self.panelA.button =wx.Button(self, label="Rechercher", pos=(260, 17))
+
+
+        self.Bind(wx.EVT_BUTTON, self.OnClick,self.panelA.button)
 
         self.panelB = wx.Window(self, -1, style=wx.SIMPLE_BORDER)
         lc = wx.LayoutConstraints()
@@ -219,7 +222,8 @@ class TestLayoutConstraints(wx.Panel):
         
         for itemvalues in liste_test:
             dvlc.AppendItem(itemvalues)
-            
+
+
 
 
         self.panelC = wx.Window(self, -1, style=wx.SIMPLE_BORDER)
@@ -250,10 +254,23 @@ class TestLayoutConstraints(wx.Panel):
         
         self.Bind(wx.EVT_BUTTON, self.OnClick,self.panelA.button)
 
+        #
+        # AJOUT PÂQUES
+        #
+        self.buttonTake =wx.Button(self, label="Prendre", pos=(260, 50))
+        self.Bind(wx.EVT_BUTTON, self.selectElem,self.buttonTake)
+
         
     def OnClick(self,event):
-        self.panelA.logger.AppendText('Evtclick: %s\n' % event.GetString())
+        str_recherche = self.panelA.editname.GetValue()
+        tab_search = search(c,str_recherche)
+        for itemvalues in tab_search:
+            self.panelB.dvlc.AppendItem(itemvalues)
 
+    def selectElem(self,event):
+        id = self.dvlc.GetSelectedRow()
+        val = self.dvlc.GetTextValue(id, 0)
+        self.panelA.logger.AppendText('item: %s\n' % val)
 
 
 

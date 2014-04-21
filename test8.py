@@ -123,20 +123,8 @@ def lecture_syllabes(c, fichier):
     for i in range(len(syllabes_suiv_triees)):
         syllabes_suiv_tup.append(
             (syllabes_suiv_triees[i][0], syllabes_suiv_triees[i][1], dico_syl_suiv[syllabes_suiv_triees[i]]))
-        
 
-    for syl1, sylSuiv, nbSyl in syllabes_suiv_triees:
-        c.execute("SELECT * FROM syllabes_precedentes WHERE syllabe_1 = '"+syl1+"' AND syl_precedente = '"+sylSuiv+"'") # cherche la paire de sylable dans la table
-        if (c.fetchone()):
-            print "if, update suiv " + syl1 + " " + sylSuiv
-            c.execute("UPDATE syllabes_precedentes SET frequence_paire=frequence_paire+"+unicode(nbSyl)+" WHERE syllabe_1='"+syl1+"' AND syl_precedente = '"+sylSuiv+"'")
-        else:
-            print "else, insert suiv " + syl1 + " " + sylSuiv
-            insertion = [syl1,sylSuiv, nbSyl]
-            c.execute("INSERT INTO syllabes_precedentes VALUES(?, ?, ?)", insertion)
-
-    #syllabes_suivantes (syllabe_2 TEXT, syl_suivante TEXT, freq_paire INT)")
-    #c.executemany("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", syllabes_suiv_tup)
+    c.executemany("INSERT INTO syllabes_suivantes VALUES(?, ?, ?)", syllabes_suiv_tup)
 
 ### Optimisation avec Sylvain -----------------
 def fais_le(c, tbl, transforms):
@@ -208,7 +196,7 @@ class TestLayoutConstraints(wx.Panel):
         lc = wx.LayoutConstraints()
         lc.top.SameAs(self, wx.Top, 0)
         lc.left.SameAs(self, wx.Left, 0)
-        lc.bottom.PercentOf(self, wx.Bottom, 35)
+        lc.bottom.SameAs(self, wx.Top, -120)
         lc.right.SameAs(self, wx.Right, 0)
         self.panelA.SetConstraints(lc)
         
@@ -288,10 +276,10 @@ class TestLayoutConstraints(wx.Panel):
 
 
     #def OnClick(self,event):
-    #    str_recherche = self.editname.GetValue()
-    #    tab_search = search(c,str_recherche)
-    #    for itemvalues in tab_search:
-    #        self.dvlc.AppendItem(itemvalues)
+    # str_recherche = self.editname.GetValue()
+    # tab_search = search(c,str_recherche)
+    # for itemvalues in tab_search:
+    # self.dvlc.AppendItem(itemvalues)
     #
 
 
